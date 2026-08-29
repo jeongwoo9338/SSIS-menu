@@ -1,0 +1,13 @@
+{
+  "name": "ssis-menu-auto-updater",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "매주 SSIS 급식 PDF를 읽어 Claude API로 파싱하고 index.html을 자동 업데이트",
+  "scripts": {
+    "update-menu": "node scripts/update-menu.mjs"
+  },
+  "dependencies": {
+    "pdf-parse": "^1.1.1"
+  }
+}
