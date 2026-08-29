@@ -1,0 +1,43 @@
+name: 급식 메뉴 자동 업데이트
+ 
+on:
+  schedule:
+    # 매주 월요일 08:30 (중국/한국 기준, UTC 00:30) 실행
+    - cron: "30 0 * * 1"
+  workflow_dispatch: {} # Actions 탭에서 수동으로도 실행 가능
+ 
+permissions:
+  contents: write
+ 
+jobs:
+  update-menu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+ 
+      - name: Node.js 설치
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+ 
+      - name: 의존성 설치
+        run: npm install
+ 
+      - name: 메뉴 업데이트 스크립트 실행
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: npm run update-menu
+ 
+      - name: 변경사항 커밋 & 푸시
+        run: |
+          git config user.name "menu-bot"
+          git config user.email "actions@github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "변경사항 없음 - 커밋 생략"
+          else
+            git commit -m "🍱 급식 메뉴 자동 업데이트 ($(date -u +'%Y-%m-%d'))"
+            git push
+          fi
+ 
