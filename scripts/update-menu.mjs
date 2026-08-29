@@ -1,10 +1,10 @@
 // scripts/update-menu.mjs
 //
-// 매주 학교 급식 PDF를 가져와서 Claude API로 파싱한 뒤,
+// 매주 학교 급식 PDF를 가져와서 Google Gemini API(무료 티어)로 파싱한 뒤,
 // index.html의 <!-- AUTO:... --> 마커 구간을 새 내용으로 갈아끼웁니다.
 //
 // 실행: node scripts/update-menu.mjs
-// 필요 환경변수: ANTHROPIC_API_KEY
+// 필요 환경변수: GEMINI_API_KEY  (Google AI Studio - aistudio.google.com/apikey 에서 무료 발급)
 // 선택 환경변수: MENU_PDF_URL (없으면 아래 기본값 사용)
 
 import fs from "node:fs/promises";
@@ -16,7 +16,7 @@ const PDF_URL =
   "https://www.suzhousinternationalschool.com/uploaded/file/Menu/SSIS_G4-G12_menu.pdf";
 
 const INDEX_HTML_PATH = path.resolve("index.html");
-const MODEL = "claude-sonnet-4-6";
+const MODEL = "gemini-2.5-flash"; // 무료 티어 모델
 
 function fail(message) {
   console.error(`❌ ${message}`);
@@ -35,7 +35,7 @@ async function downloadPdfText(url) {
   return parsed.text;
 }
 
-async function askClaudeToStructureMenu(pdfText) {
+async function askGeminiToStructureMenu(pdfText) {
   const systemPrompt = `너는 학교 급식 PDF의 텍스트를 구조화된 JSON으로 변환하는 도구다.
 반드시 아래 JSON 스키마와 정확히 일치하는 JSON "만" 출력한다. 설명, 코드블록 표시(\`\`\`), 다른 텍스트를 절대 포함하지 마라.
 
@@ -65,45 +65,61 @@ async function askClaudeToStructureMenu(pdfText) {
 - PDF에 정보가 불충분한 항목은 빈 배열이나 빈 문자열로 둔다.`;
 
   const body = {
-    model: MODEL,
-    max_tokens: 4000,
-    system: systemPrompt,
-    messages: [
+    system_instruction: {
+      parts: [{ text: systemPrompt }],
+    },
+    contents: [
       {
         role: "user",
-        content: `다음은 PDF에서 추출한 원문 텍스트다. 이걸 스키마에 맞는 JSON으로 변환해라:\n\n${pdfText.slice(
-          0,
-          15000
-        )}`,
+        parts: [
+          {
+            text: `다음은 PDF에서 추출한 원문 텍스트다. 이걸 스키마에 맞는 JSON으로 변환해라:\n\n${pdfText.slice(
+              0,
+              15000
+            )}`,
+          },
+        ],
       },
     ],
+    generationConfig: {
+      response_mime_type: "application/json",
+      temperature: 0.2,
+    },
   };
 
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+
+  const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
+      "x-goog-api-key": process.env.GEMINI_API_KEY,
     },
     body: JSON.stringify(body),
   });
 
   if (!res.ok) {
     const errText = await res.text();
-    fail(`Claude API 호출 실패: ${res.status} ${errText}`);
+    fail(`Gemini API 호출 실패: ${res.status} ${errText}`);
   }
 
   const data = await res.json();
-  const textBlock = data.content.find((b) => b.type === "text");
-  if (!textBlock) fail("Claude 응답에 텍스트가 없습니다.");
+  const candidate = data.candidates && data.candidates[0];
+  const textPart =
+    candidate && candidate.content && candidate.content.parts
+      ? candidate.content.parts.find((p) => p.text)
+      : null;
 
-  const cleaned = textBlock.text.replace(/```json|```/g, "").trim();
+  if (!textPart) {
+    fail(`Gemini 응답에 텍스트가 없습니다: ${JSON.stringify(data).slice(0, 500)}`);
+  }
+
+  const cleaned = textPart.text.replace(/```json|```/g, "").trim();
 
   try {
     return JSON.parse(cleaned);
   } catch (e) {
-    fail(`Claude 응답 JSON 파싱 실패: ${e.message}\n원문:\n${cleaned}`);
+    fail(`Gemini 응답 JSON 파싱 실패: ${e.message}\n원문:\n${cleaned}`);
   }
 }
 
@@ -162,15 +178,15 @@ function replaceBetweenMarkers(html, markerName, newContent) {
 }
 
 async function main() {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    fail("ANTHROPIC_API_KEY 환경변수가 설정되어 있지 않습니다.");
+  if (!process.env.GEMINI_API_KEY) {
+    fail("GEMINI_API_KEY 환경변수가 설정되어 있지 않습니다.");
   }
 
   console.log(`⬇️  PDF 다운로드 중: ${PDF_URL}`);
   const pdfText = await downloadPdfText(PDF_URL);
 
-  console.log("🤖 Claude API로 메뉴 파싱 중...");
-  const menu = await askClaudeToStructureMenu(pdfText);
+  console.log("🤖 Gemini API로 메뉴 파싱 중...");
+  const menu = await askGeminiToStructureMenu(pdfText);
 
   console.log("📝 index.html 업데이트 중...");
   let html = await fs.readFile(INDEX_HTML_PATH, "utf-8");
