@@ -117,8 +117,12 @@
     <header>
       <h1>SSIS G4–G12 주간 급식 메뉴</h1>
       <p>Suzhou Singapore International School · 2층<br>
-      2026년 8월 31일 (월) ~ 9월 4일 (금)</p>
+      <!-- AUTO:DATE_RANGE:START -->2026년 8월 31일 (월) ~ 9월 4일 (금)<!-- AUTO:DATE_RANGE:END --></p>
+      <p id="last-updated" style="font-size:0.75rem;opacity:0.75;margin-top:4px;">
+        <!-- AUTO:LAST_UPDATED:START -->마지막 자동 업데이트: 아직 없음<!-- AUTO:LAST_UPDATED:END -->
+      </p>
 
+      <!-- 새로고침 버튼 -->
       <button class="refresh-btn" onclick="openLatestMenu()">
         🔄 최신 메뉴 새로고침 (PDF 열기)
       </button>
@@ -127,15 +131,18 @@
     <div class="summary-box">
       <h2>한눈에 보기</h2>
       <ul style="padding-left: 18px;">
+        <!-- AUTO:SUMMARY:START -->
         <li><strong>셰프 스페셜</strong> : 매일 다른 메인 요리 (생선튀김, 모로코 치킨, 라자냐, 몽골 돼지, 탄두리 치킨)</li>
         <li><strong>채식</strong> : 채식 옵션 + 빵 + 샐러드 + 수프</li>
         <li><strong>아시안</strong> : 중식·한식 위주 요리</li>
         <li><strong>면 & 딤섬</strong> : 다양한 면 요리 + 샤오롱바오 등</li>
         <li>메인 대부분 <span class="price">¥32~35</span> · 국은 대부분 무료</li>
+        <!-- AUTO:SUMMARY:END -->
       </ul>
     </div>
 
     <div class="days">
+      <!-- AUTO:DAYS:START -->
       <!-- 월요일 -->
       <div class="day-card">
         <div class="day-header">월요일 (8/31)</div>
@@ -270,6 +277,7 @@
           </div>
         </div>
       </div>
+      <!-- AUTO:DAYS:END -->
     </div>
 
     <div class="note">
@@ -281,13 +289,16 @@
     </div>
 
     <footer>
-      데이터 출처: SSIS Official Menu PDF · Week 3 (31 Aug – 4 Sep 2026)
+      데이터 출처: SSIS Official Menu PDF · <!-- AUTO:SOURCE_LABEL:START -->Week 3 (31 Aug – 4 Sep 2026)<!-- AUTO:SOURCE_LABEL:END -->
     </footer>
   </div>
 
   <script>
     function openLatestMenu() {
+      // 학교 공식 최신 메뉴 PDF 주소 (매주 같은 주소로 업데이트됨)
       const pdfUrl = "https://www.suzhousinternationalschool.com/uploaded/file/Menu/SSIS_G4-G12_menu.pdf";
+      
+      // 새 탭에서 열기
       window.open(pdfUrl, "_blank");
     }
   </script>
