@@ -26,7 +26,7 @@ jobs:
  
       - name: 메뉴 업데이트 스크립트 실행
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npm run update-menu
  
       - name: 변경사항 커밋 & 푸시
