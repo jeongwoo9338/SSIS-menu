@@ -49,15 +49,62 @@
       transform: translateY(0);
     }
 
-    .summary-box {
+    .favorites-box {
       background: white;
       border-radius: 14px;
       padding: 20px 24px;
       margin-bottom: 24px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-      border-left: 5px solid #159895;
+      border-left: 5px solid #e67e22;
     }
-    .summary-box h2 { font-size: 1.15rem; margin-bottom: 10px; color: #1a5f7a; }
+    .favorites-box h2 { font-size: 1.05rem; margin-bottom: 4px; color: #1a5f7a; }
+    .favorites-box .hint { font-size: 0.8rem; color: #888; margin-bottom: 12px; }
+    .fav-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .fav-input-row input {
+      flex: 1;
+      min-width: 160px;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .fav-input-row button {
+      background: #e67e22;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .fav-input-row button:hover { background: #d35400; }
+    #fav-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .fav-chip {
+      background: #fff4e5;
+      border: 1px solid #ffcf8a;
+      color: #7a5c00;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .fav-chip button {
+      background: none;
+      border: none;
+      color: #a05a00;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0;
+    }
+    .star-badge { color: #e67e22; }
 
     .days {
       display: grid;
@@ -93,6 +140,7 @@
       margin-bottom: 4px;
     }
     .dish { margin: 2px 0; }
+    .dish.no-menu { color: #aaa; font-style: italic; }
     .price { color: #e67e22; font-weight: 600; font-size: 0.85rem; }
 
     .note {
@@ -128,152 +176,254 @@
       </button>
     </header>
 
-    <div class="summary-box">
-      <h2>한눈에 보기</h2>
-      <ul style="padding-left: 18px;">
-        <!-- AUTO:SUMMARY:START -->
-        <li><strong>셰프 스페셜</strong> : 매일 다른 메인 요리 (생선튀김, 모로코 치킨, 라자냐, 몽골 돼지, 탄두리 치킨)</li>
-        <li><strong>채식</strong> : 채식 옵션 + 빵 + 샐러드 + 수프</li>
-        <li><strong>아시안</strong> : 중식·한식 위주 요리</li>
-        <li><strong>면 & 딤섬</strong> : 다양한 면 요리 + 샤오롱바오 등</li>
-        <li>메인 대부분 <span class="price">¥32~35</span> · 국은 대부분 무료</li>
-        <!-- AUTO:SUMMARY:END -->
-      </ul>
+    <div class="favorites-box">
+      <h2>⭐ 즐겨찾는 메뉴</h2>
+      <p class="hint">좋아하는 요리 이름(일부만 입력해도 OK, 예: "라자냐")을 등록하면, 그 요리가 나오는 날 메뉴 옆에 ⭐가 자동으로 붙어요. 이 기기에만 저장돼요.</p>
+      <div class="fav-input-row">
+        <input type="text" id="fav-input" placeholder="예: 탄두리, 라자냐, 딤섬...">
+        <button id="fav-add-btn">추가</button>
+      </div>
+      <div id="fav-list"></div>
     </div>
 
     <div class="days">
       <!-- AUTO:DAYS:START -->
-      <!-- 월요일 -->
       <div class="day-card">
         <div class="day-header">월요일 (8/31)</div>
         <div class="day-body">
           <div class="station">
             <div class="station-name">셰프 스페셜</div>
-            <div class="dish">생선튀김 + 구운 채소 + 감자튀김</div>
+            <div class="dish">생선튀김</div>
+            <div class="dish">구운 채소</div>
+            <div class="dish">감자튀김</div>
             <div class="price">¥35</div>
           </div>
           <div class="station">
             <div class="station-name">채식</div>
             <div class="dish">매운 버섯</div>
             <div class="dish">치즈 고구마 매시</div>
+            <div class="dish">빵(선택)</div>
+            <div class="dish">믹스 샐러드</div>
+            <div class="dish">그린피 수프</div>
+            <div class="price">¥32</div>
+          </div>
+          <div class="station">
+            <div class="station-name">뚝배기</div>
+            <div class="dish">한국식 갈비탕</div>
+            <div class="dish">한국식 잡채(당면야채볶음)</div>
+            <div class="dish">쌀밥</div>
+            <div class="price">¥35</div>
           </div>
           <div class="station">
             <div class="station-name">아시안</div>
             <div class="dish">차나무버섯 오리조림 ¥13</div>
-            <div class="dish">카레 소고기 양지 ¥15</div>
+            <div class="dish">당근마 갈비조림 ¥15</div>
+            <div class="dish">소고기다짐 두부조림 ¥9</div>
+            <div class="dish">청피망소시지 계란볶음 (무료)</div>
           </div>
           <div class="station">
-            <div class="station-name">면 요리</div>
+            <div class="station-name">면 & 딤섬</div>
             <div class="dish">소주식 돈가스 면 ¥34</div>
+            <div class="dish">샤오롱바오 ¥10</div>
+          </div>
+          <div class="station">
+            <div class="station-name">샌드위치</div>
+            <div class="dish">메뉴없음</div>
+          </div>
+          <div class="station">
+            <div class="station-name">싸이드</div>
+            <div class="dish">메뉴없음</div>
           </div>
         </div>
       </div>
 
-      <!-- 화요일 -->
       <div class="day-card">
         <div class="day-header">화요일 (9/1)</div>
         <div class="day-body">
           <div class="station">
             <div class="station-name">셰프 스페셜</div>
             <div class="dish">모로코식 치킨 스튜</div>
-            <div class="dish">말레이시아 볶음밥 + 브로콜리</div>
+            <div class="dish">말레이시아 볶음밥</div>
+            <div class="dish">브로콜리</div>
             <div class="price">¥35</div>
           </div>
           <div class="station">
             <div class="station-name">채식</div>
-            <div class="dish">병아리콩 팬케이크</div>
-            <div class="dish">고구마 튀김</div>
+            <div class="dish">병아리콩 스튜 팬케이크</div>
+            <div class="dish">튀긴 고구마</div>
+            <div class="dish">빵(선택)</div>
+            <div class="dish">믹스 샐러드</div>
+            <div class="dish">버섯 수프</div>
+            <div class="price">¥32</div>
+          </div>
+          <div class="station">
+            <div class="station-name">뚝배기</div>
+            <div class="dish">메뉴없음</div>
           </div>
           <div class="station">
             <div class="station-name">아시안</div>
             <div class="dish">홍유 수육 ¥16</div>
-            <div class="dish">대만식 염소계 ¥12</div>
+            <div class="dish">대만식 소금후추 치킨 ¥12</div>
+            <div class="dish">가지완두 돼지고기조림 ¥9</div>
+            <div class="dish">오이목이버섯 닭고기볶음 (무료)</div>
           </div>
           <div class="station">
-            <div class="station-name">면 요리</div>
-            <div class="dish">버섯닭고기 쌀국수 ¥33</div>
+            <div class="station-name">면 & 딤섬</div>
+            <div class="dish">굴소스 소고기면 ¥35</div>
+          </div>
+          <div class="station">
+            <div class="station-name">샌드위치</div>
+            <div class="dish">메뉴없음</div>
+          </div>
+          <div class="station">
+            <div class="station-name">싸이드</div>
+            <div class="dish">살라미 피자 ¥35</div>
+            <div class="dish">해쉬브라운 ¥9</div>
+            <div class="dish">밀크푸딩 ¥6</div>
           </div>
         </div>
       </div>
 
-      <!-- 수요일 -->
       <div class="day-card">
         <div class="day-header">수요일 (9/2)</div>
         <div class="day-body">
           <div class="station">
             <div class="station-name">셰프 스페셜</div>
             <div class="dish">비프 라자냐</div>
-            <div class="dish">혼합 채소 + 구운 감자</div>
+            <div class="dish">혼합 채소</div>
+            <div class="dish">구운 감자</div>
             <div class="price">¥35</div>
           </div>
           <div class="station">
             <div class="station-name">채식</div>
-            <div class="dish">태국식 에그 커리</div>
+            <div class="dish">구운 감자웨지</div>
             <div class="dish">스위트칠리 두부버거</div>
+            <div class="dish">빵(선택)</div>
+            <div class="dish">믹스 샐러드</div>
+            <div class="dish">호박 수프</div>
+            <div class="price">¥32</div>
+          </div>
+          <div class="station">
+            <div class="station-name">뚝배기</div>
+            <div class="dish">미트볼 야채 덮밥</div>
+            <div class="price">¥35</div>
           </div>
           <div class="station">
             <div class="station-name">아시안</div>
             <div class="dish">오향 돼지고기 ¥15</div>
-            <div class="dish">간장 닭다리 ¥16</div>
+            <div class="dish">카레 소고기양지 ¥16</div>
+            <div class="dish">매콤 닭고기다짐볶음 ¥9</div>
+            <div class="dish">셀러리목이버섯두부 돼지고기볶음 (무료)</div>
           </div>
           <div class="station">
-            <div class="station-name">면 요리</div>
-            <div class="dish">오리다리 면 ¥32</div>
+            <div class="station-name">면 & 딤섬</div>
+            <div class="dish">버섯닭고기 쌀국수 ¥33</div>
+            <div class="dish">커스터드빵 ¥10</div>
+          </div>
+          <div class="station">
+            <div class="station-name">샌드위치</div>
+            <div class="dish">메뉴없음</div>
+          </div>
+          <div class="station">
+            <div class="station-name">싸이드</div>
+            <div class="dish">메뉴없음</div>
           </div>
         </div>
       </div>
 
-      <!-- 목요일 -->
       <div class="day-card">
         <div class="day-header">목요일 (9/3)</div>
         <div class="day-body">
           <div class="station">
             <div class="station-name">셰프 스페셜</div>
-            <div class="dish">몽골식 돼지고기 + 참깨밥</div>
-            <div class="dish">구운 감자웨지 + 호박볶음</div>
+            <div class="dish">몽골식 돼지고기 참깨밥</div>
+            <div class="dish">구운 감자웨지</div>
+            <div class="dish">볶은 애호박</div>
             <div class="price">¥35</div>
           </div>
           <div class="station">
             <div class="station-name">채식</div>
-            <div class="dish">토마토소스 콩 파스타</div>
+            <div class="dish">태국식 에그 커리</div>
             <div class="dish">카다이 채소</div>
+            <div class="dish">빵(선택)</div>
+            <div class="dish">믹스 샐러드</div>
+            <div class="dish">감자 수프</div>
+            <div class="price">¥32</div>
+          </div>
+          <div class="station">
+            <div class="station-name">뚝배기</div>
+            <div class="dish">메뉴없음</div>
           </div>
           <div class="station">
             <div class="station-name">아시안</div>
             <div class="dish">소금후추 돼지고기 ¥14</div>
-            <div class="dish">셀러리·청양 소고기볶음 ¥15</div>
+            <div class="dish">간장 닭다리조림 ¥12</div>
+            <div class="dish">회과육(두번 볶은 돼지고기) ¥9</div>
+            <div class="dish">계란찜 (무료)</div>
           </div>
           <div class="station">
-            <div class="station-name">면 요리</div>
-            <div class="dish">굴소스 소고기면 ¥35</div>
+            <div class="station-name">면 & 딤섬</div>
+            <div class="dish">소주식 돼지고기 볶음면</div>
+            <div class="dish">조림계란 + 청경채</div>
+            <div class="price">¥34</div>
+          </div>
+          <div class="station">
+            <div class="station-name">샌드위치</div>
+            <div class="dish">홍콩식 구운고기밥 ¥35</div>
+          </div>
+          <div class="station">
+            <div class="station-name">싸이드</div>
+            <div class="dish">비프 엔칠라다 ¥35</div>
+            <div class="dish">도넛 ¥8</div>
+            <div class="dish">구운 치킨윙 ¥12</div>
           </div>
         </div>
       </div>
 
-      <!-- 금요일 -->
       <div class="day-card">
         <div class="day-header">금요일 (9/4)</div>
         <div class="day-body">
           <div class="station">
             <div class="station-name">셰프 스페셜</div>
             <div class="dish">탄두리 치킨</div>
-            <div class="dish">청피망·양파 콩야채 + 파인애플 볶음밥</div>
+            <div class="dish">청피망·양파 콩야채</div>
+            <div class="dish">파인애플 볶음밥</div>
             <div class="price">¥35</div>
           </div>
           <div class="station">
             <div class="station-name">채식</div>
+            <div class="dish">토마토소스 혼합콩 파스타</div>
             <div class="dish">구운 가지</div>
+            <div class="dish">빵(선택)</div>
+            <div class="dish">믹스 샐러드</div>
+            <div class="dish">시금치 수프</div>
+            <div class="price">¥32</div>
+          </div>
+          <div class="station">
+            <div class="station-name">뚝배기</div>
+            <div class="dish">매콤 소고기조림 덮밥</div>
+            <div class="dish">콩나물</div>
+            <div class="price">¥35</div>
           </div>
           <div class="station">
             <div class="station-name">아시안</div>
             <div class="dish">소금후추 생선 ¥12</div>
-            <div class="dish">소주식 잡채 ¥9</div>
+            <div class="dish">셀러리·청양 소고기볶음 ¥15</div>
+            <div class="dish">소주식 모듬채소볶음 ¥9</div>
+            <div class="dish">청피망건두부 돼지고기볶음 (무료)</div>
           </div>
           <div class="station">
-            <div class="station-name">퀵&고 / 피자</div>
-            <div class="dish">홍콩식 구운고기밥 ¥35</div>
-            <div class="dish">살라미 피자 ¥35</div>
-            <div class="dish">비프 엔칠라다 ¥35</div>
+            <div class="station-name">면 & 딤섬</div>
+            <div class="dish">오리다리 조림면 ¥32</div>
+            <div class="dish">샤오마이 ¥10</div>
+          </div>
+          <div class="station">
+            <div class="station-name">샌드위치</div>
+            <div class="dish">모듬 샌드위치 ¥33</div>
+          </div>
+          <div class="station">
+            <div class="station-name">싸이드</div>
+            <div class="dish">메뉴없음</div>
           </div>
         </div>
       </div>
@@ -301,6 +451,122 @@
       // 새 탭에서 열기
       window.open(pdfUrl, "_blank");
     }
+
+    // ---- 즐겨찾기 기능 ----
+    const FAV_KEY = "ssis_menu_favorites";
+
+    function loadFavorites() {
+      try {
+        const raw = localStorage.getItem(FAV_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveFavorites(list) {
+      localStorage.setItem(FAV_KEY, JSON.stringify(list));
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function renderFavList() {
+      const list = loadFavorites();
+      const container = document.getElementById("fav-list");
+      container.innerHTML = "";
+
+      if (list.length === 0) {
+        container.innerHTML = '<p style="font-size:0.85rem;color:#888;">아직 등록한 즐겨찾기가 없어요.</p>';
+        return;
+      }
+
+      list.forEach((name, idx) => {
+        const chip = document.createElement("span");
+        chip.className = "fav-chip";
+        chip.innerHTML = `⭐ ${escapeHtml(name)} <button aria-label="삭제" data-idx="${idx}">×</button>`;
+        container.appendChild(chip);
+      });
+
+      container.querySelectorAll("button[data-idx]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = parseInt(btn.getAttribute("data-idx"), 10);
+          const list = loadFavorites();
+          list.splice(idx, 1);
+          saveFavorites(list);
+          renderFavList();
+          applyFavoriteStars();
+        });
+      });
+    }
+
+    function addFavorite() {
+      const input = document.getElementById("fav-input");
+      const val = input.value.trim();
+      if (!val) return;
+
+      const list = loadFavorites();
+      const alreadyExists = list.some(
+        (f) => f.toLowerCase() === val.toLowerCase()
+      );
+      if (!alreadyExists) {
+        list.push(val);
+        saveFavorites(list);
+      }
+      input.value = "";
+      renderFavList();
+      applyFavoriteStars();
+    }
+
+    function applyFavoriteStars() {
+      const favorites = loadFavorites()
+        .map((f) => f.toLowerCase())
+        .filter(Boolean);
+
+      document.querySelectorAll(".dish").forEach((dishEl) => {
+        // 기존에 붙어있던 별표 제거 (중복 방지)
+        const existing = dishEl.querySelector(".star-badge");
+        if (existing) existing.remove();
+
+        const text = dishEl.textContent.toLowerCase();
+        const isFav = favorites.some((f) => text.includes(f));
+
+        if (isFav) {
+          const star = document.createElement("span");
+          star.className = "star-badge";
+          star.textContent = " ⭐";
+          dishEl.appendChild(star);
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderFavList();
+      applyFavoriteStars();
+
+      // "메뉴없음" 텍스트에 회색/이탤릭 스타일 적용
+      document.querySelectorAll(".dish").forEach((dishEl) => {
+        if (dishEl.textContent.trim() === "메뉴없음") {
+          dishEl.classList.add("no-menu");
+        }
+      });
+
+      document.getElementById("fav-add-btn").addEventListener("click", addFavorite);
+      document.getElementById("fav-input").addEventListener("keydown", (e) => {
+        // 한글/일본어/중국어 등 IME로 글자를 조합하는 중에 Enter를 누르면
+        // 아직 완성되지 않은 글자가 먼저 제출되어 버리는 문제를 방지
+        if (e.isComposing || e.keyCode === 229) return;
+
+        if (e.key === "Enter") {
+          e.preventDefault();
+          addFavorite();
+        }
+      });
+    });
   </script>
 </body>
 </html>
