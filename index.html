@@ -106,6 +106,60 @@
     }
     .star-badge { color: #e67e22; }
 
+    /* 오늘 카드 강조 */
+    .day-card.today { border: 3px solid #e67e22; }
+    .today-badge {
+      background: #e67e22;
+      color: white;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* 지출 계산기 */
+    .calc-checkbox {
+      margin-right: 6px;
+      transform: scale(1.05);
+      vertical-align: middle;
+      cursor: pointer;
+    }
+    .station.calc-bundle .station-name {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .dish.calc-item {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .day-total {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed #ccc;
+      font-weight: 700;
+      color: #1a5f7a;
+      font-size: 0.9rem;
+      text-align: right;
+    }
+    .day-total.today-total {
+      color: #e67e22;
+    }
+    .reset-calc-btn {
+      background: none;
+      border: 1px solid #ccc;
+      color: #888;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 8px;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    .reset-calc-btn:hover { background: #f0f0f0; }
+
     .days {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -211,6 +265,11 @@
             <div class="dish">메뉴없음</div>
           </div>
           <div class="station">
+            <div class="station-name">샐러드바</div>
+            <div class="dish">두부피 청경채 볶음 (무료)</div>
+            <div class="dish">두시(간장) 오크라조림 ¥5</div>
+          </div>
+          <div class="station">
             <div class="station-name">아시안</div>
             <div class="dish">차나무버섯 오리조림 ¥13</div>
             <div class="dish">당근·마 조림 돼지고기 ¥15</div>
@@ -259,6 +318,11 @@
             <div class="dish">밀크푸딩 ¥6</div>
           </div>
           <div class="station">
+            <div class="station-name">샐러드바</div>
+            <div class="dish">식초 다시마 무침 (무료)</div>
+            <div class="dish">상추(잎채소) ¥5</div>
+          </div>
+          <div class="station">
             <div class="station-name">아시안</div>
             <div class="dish">홍유 수육 ¥16</div>
             <div class="dish">대만식 소금후추 치킨 ¥12</div>
@@ -303,6 +367,11 @@
           <div class="station">
             <div class="station-name">싸이드</div>
             <div class="dish">메뉴없음</div>
+          </div>
+          <div class="station">
+            <div class="station-name">샐러드바</div>
+            <div class="dish">탕수 연근 (무료)</div>
+            <div class="dish">양상추 ¥5</div>
           </div>
           <div class="station">
             <div class="station-name">아시안</div>
@@ -353,6 +422,11 @@
             <div class="dish">구운 치킨윙 ¥12</div>
           </div>
           <div class="station">
+            <div class="station-name">샐러드바</div>
+            <div class="dish">감자·피망·가지 볶음 (무료)</div>
+            <div class="dish">항저우 배추 ¥5</div>
+          </div>
+          <div class="station">
             <div class="station-name">아시안</div>
             <div class="dish">소금후추 돼지고기 ¥14</div>
             <div class="dish">간장 닭다리조림 ¥12</div>
@@ -400,6 +474,11 @@
           <div class="station">
             <div class="station-name">싸이드</div>
             <div class="dish">메뉴없음</div>
+          </div>
+          <div class="station">
+            <div class="station-name">샐러드바</div>
+            <div class="dish">당근 콩나물볶음 (무료)</div>
+            <div class="dish">광둥 배추(초이심) ¥5</div>
           </div>
           <div class="station">
             <div class="station-name">아시안</div>
@@ -539,6 +618,9 @@
         }
       });
 
+      setupTodayHighlight();
+      setupSpendingCalculator();
+
       document.getElementById("fav-add-btn").addEventListener("click", addFavorite);
       document.getElementById("fav-input").addEventListener("keydown", (e) => {
         // 한글/일본어/중국어 등 IME로 글자를 조합하는 중에 Enter를 누르면
@@ -551,6 +633,117 @@
         }
       });
     });
+
+    // ---- 오늘 카드 자동 강조 ----
+    function setupTodayHighlight() {
+      const jsDay = new Date().getDay(); // 0=일 1=월 ... 6=토
+      const dayIndex = jsDay - 1; // 월=0, 화=1, 수=2, 목=3, 금=4
+      const cards = document.querySelectorAll(".day-card");
+      if (dayIndex < 0 || dayIndex > 4) return; // 주말이면 강조 없음
+
+      const todayCard = cards[dayIndex];
+      if (!todayCard) return;
+
+      todayCard.classList.add("today");
+      const header = todayCard.querySelector(".day-header");
+      if (header && !header.querySelector(".today-badge")) {
+        const badge = document.createElement("span");
+        badge.className = "today-badge";
+        badge.textContent = "오늘";
+        header.appendChild(badge);
+      }
+    }
+
+    // ---- 오늘 총 예상 지출 계산기 ----
+    function extractPrice(text) {
+      const match = text.match(/¥\s?(\d+(?:\.\d+)?)/);
+      return match ? parseFloat(match[1]) : null;
+    }
+
+    function setupSpendingCalculator() {
+      document.querySelectorAll(".day-card").forEach((card) => {
+        const stations = card.querySelectorAll(".station");
+
+        stations.forEach((station) => {
+          const priceEl = station.querySelector(".price");
+
+          if (priceEl) {
+            // 세트(콤보) 가격: 코너 전체가 한 묶음
+            const price = extractPrice(priceEl.textContent);
+            if (price === null) return;
+
+            station.classList.add("calc-bundle");
+            const nameEl = station.querySelector(".station-name");
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "calc-checkbox";
+            checkbox.dataset.price = price;
+
+            nameEl.prepend(checkbox);
+
+            checkbox.addEventListener("change", () => updateDayTotal(card));
+            nameEl.addEventListener("click", (e) => {
+              if (e.target !== checkbox) {
+                checkbox.checked = !checkbox.checked;
+                updateDayTotal(card);
+              }
+            });
+          } else {
+            // 개별 가격: 요리마다 따로 체크
+            const dishes = station.querySelectorAll(".dish");
+            dishes.forEach((dish) => {
+              if (dish.classList.contains("no-menu")) return;
+              const price = extractPrice(dish.textContent);
+              if (price === null) return;
+
+              dish.classList.add("calc-item");
+              const checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.className = "calc-checkbox";
+              checkbox.dataset.price = price;
+
+              dish.prepend(checkbox);
+
+              checkbox.addEventListener("change", () => updateDayTotal(card));
+              dish.addEventListener("click", (e) => {
+                if (e.target !== checkbox) {
+                  checkbox.checked = !checkbox.checked;
+                  updateDayTotal(card);
+                }
+              });
+            });
+          }
+        });
+
+        // 합계 표시 영역 + 초기화 버튼
+        const dayBody = card.querySelector(".day-body");
+        const totalRow = document.createElement("div");
+        totalRow.className = "day-total";
+        if (card.classList.contains("today")) totalRow.classList.add("today-total");
+        totalRow.innerHTML =
+          '<span class="total-label">합계: ¥0</span>' +
+          '<button type="button" class="reset-calc-btn">초기화</button>';
+        dayBody.appendChild(totalRow);
+
+        totalRow.querySelector(".reset-calc-btn").addEventListener("click", () => {
+          card.querySelectorAll(".calc-checkbox").forEach((cb) => (cb.checked = false));
+          updateDayTotal(card);
+        });
+
+        updateDayTotal(card); // 초기 라벨(오늘/합계) 표시
+      });
+    }
+
+    function updateDayTotal(card) {
+      let sum = 0;
+      card.querySelectorAll(".calc-checkbox:checked").forEach((cb) => {
+        sum += parseFloat(cb.dataset.price) || 0;
+      });
+      const label = card.querySelector(".total-label");
+      const prefix = card.classList.contains("today") ? "오늘 예상 지출: " : "합계: ";
+      if (label) label.textContent = `${prefix}¥${sum}`;
+    }
   </script>
 </body>
 </html>
